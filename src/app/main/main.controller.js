@@ -49,6 +49,47 @@
     //   }
     // }
 
+    var callback = {
+        onMessageArrived: function(message) { 
+            console.log("MESSAGE ARRIVED", arguments);
+            var topic = message.destinationName;
+            var payload = message.payloadString;            
+            console.log("ARRIVED", topic, payload); 
 
+        },
+        onConnect: function(mqtt) {
+            console.log("user onCOnnect", mqtt);
+            mqtt.subscribe("#", {qos: 0});
+            // angular.forEach(topic_list, function(topic, idx) {
+            //   console.log("subscribing..", topic);
+            //   // mqtt.subscribe(topic, {qos: 0});
+            // });
+        }
+
+    }
+
+    mqttService.connect(callback);
+
+    function onMessageArrived(message) {
+        var topic = message.destinationName;
+        var payload = message.payloadString;
+        var json = JSON.parse(payload);
+        
+        if (topic.indexOf("/command") !== false) {
+          if (payload == "0") {
+            $scope.enabled = false;
+          }
+          else if (payload == "1") {
+            $scope.enabled = true;
+          }
+          $scope.$apply();
+        }
+
+        if (json.d && json.d.myName == "TONG")  {
+          $scope.heartbeat = json.d;
+          $scope.$apply();
+          console.log(json.d && json.d.myName);
+        }
+    };
   }
 })();
