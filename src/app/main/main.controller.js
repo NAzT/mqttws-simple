@@ -12,77 +12,55 @@
   /** @ngInject */
   function MainController($scope, $timeout, toastr, mqttService) {
     var vm = this;
-
-    // activate();
-
-    // function activate() {
-    //   $timeout(function() {
-    //     vm.classAnimation = 'rubberBand';
-    //   }, 4000);
-    // }
-
-    // function showToastr() {
-    //   toastr.info('Fork <a href="https://github.com/Swiip/generator-gulp-angular" target="_blank"><b>generator-gulp-angular</b></a>');
-    //   vm.classAnimation = '';
-    // }
-
-    $scope.heartbeat = "WAITING...";
-    // var reconnectTimeout = 2000;
-
-    // MQTTconnect();
-
-    // $scope.enable = function(state) {
-    //   var qos = 0;
-    //   var retain = true;
-    //   if (state) {
-    //     mqtt.send("esp8266/18:fe:34:fe:c0:ff/command", "1", qos, retain)
-    //   }
-    //   else {
-    //     mqtt.send("esp8266/18:fe:34:fe:c0:ff/command", "0", qos, retain);
-    //   }
-    // }
-
     var callback = {
         onMessageArrived: function(message) { 
-            console.log("MESSAGE ARRIVED", arguments);
             var topic = message.destinationName;
-            var payload = message.payloadString;            
-            console.log("ARRIVED", topic, payload); 
+            var payload = message.payloadString;
 
+            if (topic.indexOf("/command") != -1) {
+              $scope.command =  payload;
+              if (payload == "0") {
+                $scope.enabled = false;
+              }
+              else if (payload == "1") {
+                $scope.enabled = true;
+              }
+            }
+            else {
+                $scope.heartbeat = payload;
+            }
+            $scope.$apply();
         },
         onSuccess: function(mqtt) {
+            $scope.sub_topic = "esp8266/" + $scope.macaddr + "/status";
+            $scope.pub_topic = "esp8266/" + $scope.macaddr + "/command";
+
+            var topics = [$scope.sub_topic, $scope.pub_topic];
             console.log("user onCOnnect", mqtt);
-            mqtt.subscribe("#", {qos: 0});
-            // angular.forEach(topic_list, function(topic, idx) {
-            //   console.log("subscribing..", topic);
-            //   // mqtt.subscribe(topic, {qos: 0});
-            // });
+            angular.forEach(topics, function(topic, idx) {
+              console.log("subscribing..", topic);
+              mqtt.subscribe(topic, {qos: 0});
+              $scope.mqtt = mqtt;
+            });
         }
 
     }
 
-    mqttService.connect(callback);
 
-    function onMessageArrived(message) {
-        var topic = message.destinationName;
-        var payload = message.payloadString;
-        var json = JSON.parse(payload);
-        
-        if (topic.indexOf("/command") !== false) {
-          if (payload == "0") {
-            $scope.enabled = false;
-          }
-          else if (payload == "1") {
-            $scope.enabled = true;
-          }
-          $scope.$apply();
-        }
+    $scope.enable = function(flag) {
+        console.log("FLAG", flag);
+        var qos = 0;
+        var retain = true;
+        console.log($scope.pub_topic);
+        if (!!$scope.mqtt) {
+            $scope.mqtt.send($scope.pub_topic, flag.toString(), qos, retain);
 
-        if (json.d && json.d.myName == "TONG")  {
-          $scope.heartbeat = json.d;
-          $scope.$apply();
-          console.log(json.d && json.d.myName);
         }
-    };
+    }
+
+    $scope.connect = function() {
+        mqttService.connect(callback);
+    }
+
   }
 })();
