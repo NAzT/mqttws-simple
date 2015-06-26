@@ -11,8 +11,8 @@ angular.module('mqttwsSimple')
 // AngularJS will instantiate a singleton by calling "new" on this function
 
 
-    var host = 'test.mosquitto.org'; // hostname or IP address
-    var port = 8080 ;
+    var host = '128.199.104.122'; // hostname or IP address
+    var port = 9001;
     var useTLS = false;
     var username = null;
     var password = null;
@@ -23,6 +23,7 @@ angular.module('mqttwsSimple')
     var reconnectTimeout = 2000;
 
     var userOnConnected = function() { }
+    var userOnMessageArrived = function() { }
 
     function MQTTconnect() {
         mqtt = new Paho.MQTT.Client(
@@ -34,18 +35,23 @@ angular.module('mqttwsSimple')
             timeout: 3,
             useSSL: useTLS,
             cleanSession: cleansession,
-            onSuccess: onConnect,
+            onSuccess: onSuccess,
             onFailure: function (message) {
                 console.log("failed");
                 setTimeout(MQTTconnect, reconnectTimeout);
             }
         };
 
+        if (username != null) {
+            options.userName = username;
+            options.password = password;
+        }
+
         console.log("Host="+ host + ", port=" + port + " TLS = " + useTLS + " username=" + username + " password=" + password);
         mqtt.connect(options);
     }
 
-    function onConnect() {
+    function onSuccess() {
         console.log('Connected to ' + host + ':' + port);
         userOnConnected(mqtt);
     }
@@ -53,7 +59,8 @@ angular.module('mqttwsSimple')
 
     this.connect = function(callbackFn) {
         console.log(callbackFn);
-        userOnConnected = callbackFn.onConnect || function() { };
+        userOnConnected = callbackFn.onSuccess || function() { };
+        userOnMessageArrived = callbackFn.onMessageArrived || function() { };
 
         if (mqtt != null) {
             mqtt.disconnect();
@@ -69,6 +76,7 @@ angular.module('mqttwsSimple')
         mqtt.onMessageArrived = function(message) {
             var topic = message.destinationName;
             var payload = message.payloadString;
+            userOnMessageArrived(message);
         }
     }
 

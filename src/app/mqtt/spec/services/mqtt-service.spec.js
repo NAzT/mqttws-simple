@@ -1,3 +1,5 @@
+'use strict';
+
 describe('Service: mqttService', function() {
   var mqtt;
   beforeEach(module('mqttwsSimple'));

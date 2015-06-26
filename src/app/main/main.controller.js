@@ -10,15 +10,8 @@
   // }
 
   /** @ngInject */
-  function MainController($scope, $timeout, webDevTec, toastr, mqttService) {
+  function MainController($scope, $timeout, toastr, mqttService) {
     var vm = this;
-
-    console.log(mqttService);
-
-    // vm.awesomeThings = [];
-    // vm.classAnimation = '';
-    // vm.creationDate = 1435123596915;
-    // vm.showToastr = showToastr;
 
     // activate();
 
@@ -33,7 +26,7 @@
     //   vm.classAnimation = '';
     // }
 
-    // $scope.heartbeat = "WAITING...";
+    $scope.heartbeat = "WAITING...";
     // var reconnectTimeout = 2000;
 
     // MQTTconnect();
@@ -57,7 +50,7 @@
             console.log("ARRIVED", topic, payload); 
 
         },
-        onConnect: function(mqtt) {
+        onSuccess: function(mqtt) {
             console.log("user onCOnnect", mqtt);
             mqtt.subscribe("#", {qos: 0});
             // angular.forEach(topic_list, function(topic, idx) {
