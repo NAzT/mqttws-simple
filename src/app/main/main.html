@@ -1,4 +1,4 @@
-<div layout="vertical" layout-fill>
+<div layout="vertical" layout-fill  layout-align="center">
 
   <md-content>
     <header>
@@ -8,13 +8,13 @@
     <section class="jumbotron">
       <h1>{{ command }}</h1>
       <p class="lead">
-        <!-- <img src="assets/images/yeoman.png" alt="I'm Yeoman"><br> -->
+        <img src="assets/images/yeoman.png" alt="I'm Yeoman"><br>
       </p>
           <section flex layout="row" layout-align="center">
             <md-button ng-click="enable(1)" href="#" class="md-raised">เปิด</md-button>
             <md-button ng-click="enable(0)" href="#" class="md-raised">ปิด</md-button>
           </section>
-          <p class="lead"> {{ macaddr }} </p>
+          <!-- <p class="lead"> {{ macaddr }} </p> -->
           <p class="lead" ng-show="heartbeat"> {{ heartbeat }} </p>
     </section>
 
