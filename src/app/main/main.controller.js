@@ -47,7 +47,7 @@
     // username = "jjolie";
     // password = "aa";
 
-    var topic_list = ["esp8266/18:fe:34:fe:c0:ff/#"];
+    var topic_list = ["#"];
 
     var mqtt;
     var reconnectTimeout = 2000;
@@ -92,23 +92,27 @@
     function onMessageArrived(message) {
         var topic = message.destinationName;
         var payload = message.payloadString;
-        var json = JSON.parse(payload);
-        
-        if (topic.indexOf("/command") !== false) {
-          if (payload == "0") {
-            $scope.enabled = false;
-          }
-          else if (payload == "1") {
-            $scope.enabled = true;
-          }
-          $scope.$apply();
-        }
 
-        if (json.d && json.d.myName == "TONG")  {
-          $scope.heartbeat = json.d;
-          $scope.$apply();
-          console.log(json.d && json.d.myName);
-        }
+        $scope.heartbeat = payload;
+        $scope.$apply();
+
+        // var json = JSON.parse(payload);
+        
+        // if (topic.indexOf("/command") !== false) {
+        //   if (payload == "0") {
+        //     $scope.enabled = false;
+        //   }
+        //   else if (payload == "1") {
+        //     $scope.enabled = true;
+        //   }
+        //   $scope.$apply();
+        // }
+
+        // if (json.d && json.d.myName == "TONG")  {
+        //   $scope.heartbeat = json.d;
+        //   $scope.$apply();
+        //   console.log(json.d && json.d.myName);
+        // }
 
     };
 
