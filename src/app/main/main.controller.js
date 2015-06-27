@@ -43,9 +43,12 @@
               $scope.mqtt = mqtt;
             });
         }
-
     }
 
+    $scope.$watch('sendText', function() {
+        console.log("sendText", $scope.sendText);
+        $scope.enable($scope.sendText);
+    });
 
     $scope.enable = function(flag) {
         console.log("FLAG", flag);
